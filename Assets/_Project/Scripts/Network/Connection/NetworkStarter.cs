@@ -1,4 +1,5 @@
 using System;
+using LindoNoxStudio.Network.Simulation;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
@@ -25,6 +26,11 @@ namespace LindoNoxStudio.Network.Connection
             #elif Server
             StartServer();
             #endif
+        }
+
+        private void Update()
+        {
+            SimulationManager.Update(Time.deltaTime);
         }
 
         private void SetConnectionData()
@@ -67,6 +73,7 @@ namespace LindoNoxStudio.Network.Connection
                 };
             
             NetworkManager.Singleton.StartServer();
+            SimulationManager.StartTickSystem();
         } 
         #endif
     }

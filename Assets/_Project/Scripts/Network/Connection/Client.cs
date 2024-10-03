@@ -5,7 +5,7 @@ namespace LindoNoxStudio.Network.Connection
 {
     public class Client
     {
-        private static List<Client> _clients = new List<Client>();
+        public static List<Client> Clients = new List<Client>();
         
         public string UniqueName => DisplayName + "(" + Uuid + ")";
         
@@ -17,22 +17,22 @@ namespace LindoNoxStudio.Network.Connection
 
         public static Client GetClientByUuid(ulong uuid)
         {
-            return _clients.Find(c => c.Uuid == uuid);
+            return Clients.Find(c => c.Uuid == uuid);
         }
         
         public static Client GetClientByClientId(ulong clientId)
         {
-            return _clients.Find(c => c.ClientId == clientId);
+            return Clients.Find(c => c.ClientId == clientId);
         }
 
         public void Add()
         {
-            _clients.Add(this);
+            Clients.Add(this);
         }
         
         public void Remove()
         {
-            _clients.Remove(this);
+            Clients.Remove(this);
         }
         
         public void Joined()
