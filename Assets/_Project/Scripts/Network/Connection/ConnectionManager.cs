@@ -7,6 +7,9 @@ namespace LindoNoxStudio.Network.Connection
     public static class ConnectionManager
     {
         #if Server
+        public const int WantedPlayerCount = 1;
+        public static int CurrentPlayerCount;
+        
         public static void OnClientJoinRequest(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
             var payload = ConnectionPayload.Decode(request.Payload);
@@ -23,13 +26,11 @@ namespace LindoNoxStudio.Network.Connection
                 // New player
                 if (GameManager.GameState == GameState.WaitingForPlayers)
                 {
-                    // Todo: Check player limit and start game conditions
-                    
                     // Game hasn't started yet
                     response.Approved = true;
                     
                     // Adding new client
-                    newClient.Add();
+                    newClient.Add(); 
                 }
                 else
                 {
@@ -46,7 +47,7 @@ namespace LindoNoxStudio.Network.Connection
                 {
                     // Reconnect
                     response.Approved = true;
-                    // Test
+                    
                     Debug.Log(existingClient.UniqueName + "Client Reconnected");
 
                     existingClient.ClientId = newClient.ClientId;
@@ -66,13 +67,31 @@ namespace LindoNoxStudio.Network.Connection
         public static void OnClientJoined(Client newClient)
         {
             newClient.Joined();
+            CurrentPlayerCount++;
+            
+            // Todo: Check player limit and start game condition
+            if (CurrentPlayerCount == WantedPlayerCount)
+                GameManager.StartGame();
+            
             Debug.Log(newClient.UniqueName + " Joined");
         }
 
         public static void OnClientLeft(Client leftClient)
         {
-            leftClient.Left();
-            Debug.Log(leftClient.UniqueName + " Left");
+
+            if (GameManager.GameState == GameState.WaitingForPlayers)
+            {
+                leftClient.Remove();
+                CurrentPlayerCount--;
+                
+                Debug.Log(leftClient.UniqueName + " Left");
+            }
+            else
+            {
+                leftClient.Left();
+
+                Debug.Log(leftClient.UniqueName + " Disconnected");
+            }
         }
         
         #endif 
