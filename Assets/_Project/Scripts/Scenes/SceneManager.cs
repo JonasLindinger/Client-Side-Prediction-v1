@@ -21,9 +21,11 @@ namespace LindoNoxStudio.Scenes
         {
             if (Instance != null)
             {
-                Debug.Log("Duplicate found");
+                Debug.LogError("Duplicate found");
                 Destroy(gameObject);
+                return;
             }
+            
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }

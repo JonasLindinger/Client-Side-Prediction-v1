@@ -7,7 +7,7 @@ namespace LindoNoxStudio.Network.Connection
     public static class ConnectionManager
     {
         #if Server
-        public const int WantedPlayerCount = 1;
+        public const int WantedPlayerCount = 2;
         public static int CurrentPlayerCount;
         
         public static void OnClientJoinRequest(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
@@ -30,7 +30,8 @@ namespace LindoNoxStudio.Network.Connection
                     response.Approved = true;
                     
                     // Adding new client
-                    newClient.Add(); 
+                    newClient.Add();
+                    NetworkClientSpawner.Instance.Spawn(newClient.ClientId);
                 }
                 else
                 {
@@ -78,7 +79,6 @@ namespace LindoNoxStudio.Network.Connection
 
         public static void OnClientLeft(Client leftClient)
         {
-
             if (GameManager.GameState == GameState.WaitingForPlayers)
             {
                 leftClient.Remove();

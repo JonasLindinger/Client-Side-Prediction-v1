@@ -41,7 +41,8 @@ namespace LindoNoxStudio.Network.Connection
         #if Client
         private void StartClient()
         {
-            NetworkManager.Singleton.NetworkConfig.ConnectionData = ConnectionPayload.Encode((ulong)Mathf.Abs(gameObject.GetInstanceID()), "Client " + Random.Range(0, 1000));
+            ulong clientId = (ulong) Random.Range(11111, 99999);
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = ConnectionPayload.Encode(clientId, "Client " + clientId);
             NetworkManager.Singleton.StartClient();
         }
         #elif Server
@@ -57,7 +58,10 @@ namespace LindoNoxStudio.Network.Connection
                             ConnectionManager.OnClientJoined(Client.GetClientByClientId(connectionEvent.ClientId));
                             break;
                         case ConnectionEvent.ClientDisconnected:
-                            ConnectionManager.OnClientLeft(Client.GetClientByClientId(connectionEvent.ClientId));
+                            Client leftClient = Client.GetClientByClientId(connectionEvent.ClientId);
+                            
+                            if (leftClient == null) return;
+                            ConnectionManager.OnClientLeft(leftClient);
                             break;
                     }
                 };
