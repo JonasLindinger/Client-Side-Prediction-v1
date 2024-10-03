@@ -46,7 +46,7 @@ namespace LindoNoxStudio.Network.Connection
                 {
                     // Reconnect
                     response.Approved = true;
-                    
+                    // Test
                     Debug.Log(existingClient.UniqueName + "Client Reconnected");
 
                     existingClient.ClientId = newClient.ClientId;
