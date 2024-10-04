@@ -1,3 +1,5 @@
+using LindoNoxStudio.Network.Connection;
+using LindoNoxStudio.Network.Player;
 using UnityEngine;
 
 namespace LindoNoxStudio.Network.Simulation
@@ -50,31 +52,43 @@ namespace LindoNoxStudio.Network.Simulation
 
         private static void HandlePhysicsTick(uint tick)
         {
-            Debug.Log("Physics tick: ");
             // Simulating physics for the time between ticks
             Physics.Simulate(PhysicsTickSystem.TimeBetweenTicks);
 
             #if Client
-            // Todo: Move local player and save inputs
+            // Saving input for the current tick
+            if (!NetworkClient.LocalClient) return;
+            if (!NetworkClient.LocalClient._input) return;
+            NetworkClient.LocalClient._input.SaveInput(tick);
+            
+            // Predicting local player state and sending input to server
+            if (NetworkPlayer.LocalNetworkPlayer)
+                NetworkPlayer.LocalNetworkPlayer.PredictLocalState(tick);
             #elif Server
-            // Todo: Move all players
+            // Move all players
+            foreach (Client client in Client.Clients)
+            {
+                if (!client.NetworkPlayer) continue;
+                client.NetworkPlayer.HandleState(tick);
+            }
             #endif
         }
         
         private static void HandleStateTick(uint tick)
         {
-            Debug.Log("State tick: ");
             #if Client
-            // Todo: Send inputs to server
+            // Send inputs to server
+            if (!NetworkClient.LocalClient) return;
+            if (!NetworkClient.LocalClient._input) return;
+            NetworkClient.LocalClient._input.SendInputs();
             #elif Server
-            // Todo: Send states to server
+            // Todo: Send states to clients
             #endif
         }
         
         #if Server
         private static void HandleAdjustmentTick(uint tick)
         {
-            Debug.Log("Adjustment tick: ");
             // Todo: Send tick adjustments to clients
         }
         #endif

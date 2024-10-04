@@ -48,13 +48,11 @@ namespace LindoNoxStudio.Network.Connection
                 {
                     // Reconnect
                     response.Approved = true;
+
+                    // Handle ownership and update clientId
+                    existingClient.Reconnected(newClient.ClientId);
                     
                     Debug.Log(existingClient.UniqueName + "Client Reconnected");
-
-                    existingClient.ClientId = newClient.ClientId;
-                    Debug.Log("Worked: " + (existingClient.ClientId == newClient.ClientId).ToString());
-
-                    // Todo: Handle ownership
                 }
                 else
                 {

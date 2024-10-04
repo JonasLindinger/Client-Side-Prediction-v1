@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using LindoNoxStudio.Network.Player;
 using UnityEngine;
 
 namespace LindoNoxStudio.Network.Connection
@@ -14,6 +15,9 @@ namespace LindoNoxStudio.Network.Connection
         
         public string DisplayName;
         public bool IsOnline;
+        
+        public NetworkClient NetworkClient;
+        public NetworkPlayer NetworkPlayer;
 
         public static Client GetClientByUuid(ulong uuid)
         {
@@ -43,6 +47,25 @@ namespace LindoNoxStudio.Network.Connection
         public void Left()
         {
             IsOnline = false;
+        }
+        
+        public void Reconnected(ulong clientId)
+        {
+            ClientId = clientId;
+            NetworkClient.NetworkObject.ChangeOwnership(clientId);
+            NetworkPlayer.NetworkObject.ChangeOwnership(clientId);
+            
+            Debug.Log("Reconnectiong worked: " + (GetClientByUuid(Uuid).ClientId == clientId));
+        }
+
+        public void Reference(NetworkClient networkClient)
+        {
+            NetworkClient = networkClient;
+        }
+
+        public void Reference(NetworkPlayer networkPlayer)
+        {
+            NetworkPlayer = networkPlayer;
         }
     }
 }
