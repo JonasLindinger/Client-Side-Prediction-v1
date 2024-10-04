@@ -39,9 +39,8 @@ namespace LindoNoxStudio.Network.Connection
 
             // Spawn the object on the specific client
             client.NetworkObject.SpawnWithObservers = false;
-            client.NetworkObject.Spawn(false);
+            client.NetworkObject.SpawnWithOwnership(clientId);
             client.NetworkObject.NetworkShow(clientId);
-            client.NetworkObject.ChangeOwnership(clientId);
         }
         #endif
     }

@@ -37,8 +37,7 @@ namespace LindoNoxStudio.Network.Player
             PlayerController player = Instantiate(_playerPrefab, Vector3.zero, Quaternion.identity);
 
             // Spawn the object on every client
-            player.NetworkObject.Spawn(false);
-            player.NetworkObject.ChangeOwnership(clientId);
+            player.NetworkObject.SpawnWithOwnership(clientId);
         }
         #endif
     }
