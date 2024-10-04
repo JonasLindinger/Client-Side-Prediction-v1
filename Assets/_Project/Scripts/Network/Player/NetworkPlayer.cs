@@ -9,13 +9,17 @@ namespace LindoNoxStudio.Network.Player
     [RequireComponent(typeof(PlayerController))]
     public class NetworkPlayer : NetworkBehaviour
     {
+        
         #if Client
         public static NetworkPlayer LocalNetworkPlayer { get; private set; }
+        
         #elif Server
+        
         private Client _networkClient;
         #endif
         
         private PlayerController _playerController;
+        [HideInInspector] public PlayerStateSyncronisation _playerStateSyncronisation;
         
         public override void OnNetworkSpawn()
         {
@@ -25,8 +29,10 @@ namespace LindoNoxStudio.Network.Player
             #elif Server
             _networkClient = Client.GetClientByClientId(OwnerClientId);
             _networkClient.NetworkPlayer = this;
-            #endif
             
+            #endif
+
+            _playerStateSyncronisation = GetComponent<PlayerStateSyncronisation>();
             _playerController = GetComponent<PlayerController>();
         }
         
@@ -41,18 +47,24 @@ namespace LindoNoxStudio.Network.Player
         #if Client
         public void PredictLocalState(uint tick)
         {
+            // Getting input to process
             ClientInputState input = NetworkClient.LocalClient._input.GetClientInputState(tick);
-            _playerController.OnInput(input);
             
-            // Todo: Save state for later use
+            _playerStateSyncronisation.SaveState(tick, input);
+
+            // Process new input
+            _playerController.OnInput(input);
         }
         #elif Server
-        public void HandleState(uint tick) 
-        {
+        public void HandleState(uint tick)
+        {   
+            // Getting input to process
             ClientInputState input = _networkClient.NetworkClient._input.GetClientInputState(tick);
-            _playerController.OnInput(input);
+
+            _playerStateSyncronisation.SaveState(tick, input);
             
-            // Todo: Save state for later use, but don't send the states. We do that in the state tick
+            // Process new input
+            _playerController.OnInput(input);
         }
         #endif
     }

@@ -10,9 +10,9 @@ namespace LindoNoxStudio.Network.Input
     [RequireComponent(typeof(PlayerInput))]
     public class ClientInput : NetworkBehaviour
     {
-        #if Client
-        
         private const int InputBufferSize = 128; // 8 bit | 1 byte
+        
+        #if Client
         private ClientInputState[] _localClientInputStates = new ClientInputState[InputBufferSize];
 
         private uint _tickWeFirstStartedSavingInputs;
@@ -20,7 +20,6 @@ namespace LindoNoxStudio.Network.Input
         private PlayerInput _playerInput;
         
         #elif Server
-        private const int InputBufferSize = 128; // 8 bit | 1 byte
         private ClientInputState[] _clientInputStates = new ClientInputState[InputBufferSize];
 
         private int _bufferSize;
@@ -135,7 +134,6 @@ namespace LindoNoxStudio.Network.Input
             #if Server
             uint newestInputTick = 0;
             
-            // Todo: Save inputs
             foreach (ClientInputState input in inputs)
             {
                 if (input == null) continue;

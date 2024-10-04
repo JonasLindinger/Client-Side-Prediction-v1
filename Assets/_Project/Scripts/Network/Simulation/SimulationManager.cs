@@ -27,6 +27,9 @@ namespace LindoNoxStudio.Network.Simulation
             
             // Startting tick systems
             PhysicsTickSystem = new TickSystem(PhysicsTickRate, startingTick);
+            #if Client
+            PhysicsTickSystem.OnTick += SaveInput;
+            #endif
             PhysicsTickSystem.OnTick += HandlePhysicsTick;
             
             StateTickSystem = new TickSystem(StateTickRate);
@@ -50,17 +53,12 @@ namespace LindoNoxStudio.Network.Simulation
             #endif
         }
 
-        private static void HandlePhysicsTick(uint tick)
+        public static void HandlePhysicsTick(uint tick)
         {
             // Simulating physics for the time between ticks
             Physics.Simulate(PhysicsTickSystem.TimeBetweenTicks);
 
             #if Client
-            // Saving input for the current tick
-            if (!NetworkClient.LocalClient) return;
-            if (!NetworkClient.LocalClient._input) return;
-            NetworkClient.LocalClient._input.SaveInput(tick);
-            
             // Predicting local player state and sending input to server
             if (NetworkPlayer.LocalNetworkPlayer)
                 NetworkPlayer.LocalNetworkPlayer.PredictLocalState(tick);
@@ -73,6 +71,16 @@ namespace LindoNoxStudio.Network.Simulation
             }
             #endif
         }
+
+        #if Client
+        private static void SaveInput(uint tick)
+        {
+            // Saving input for the current tick
+            if (!NetworkClient.LocalClient) return;
+            if (!NetworkClient.LocalClient._input) return;
+            NetworkClient.LocalClient._input.SaveInput(tick);
+        }
+        #endif
         
         private static void HandleStateTick(uint tick)
         {
@@ -82,7 +90,13 @@ namespace LindoNoxStudio.Network.Simulation
             if (!NetworkClient.LocalClient._input) return;
             NetworkClient.LocalClient._input.SendInputs();
             #elif Server
-            // Todo: Send states to clients
+            // Sending states to clients
+            foreach (var client in Client.Clients)
+            {
+                if (!client.NetworkPlayer) continue;
+                if (!client.NetworkPlayer._playerStateSyncronisation) continue;
+                client.NetworkPlayer._playerStateSyncronisation.SendState();
+            }
             #endif
         }
         
@@ -90,6 +104,7 @@ namespace LindoNoxStudio.Network.Simulation
         private static void HandleAdjustmentTick(uint tick)
         {
             // Todo: Send tick adjustments to clients
+            // Todo: Add options: BufferSize: Minimal, Good, Maximal
         }
         #endif
     }
