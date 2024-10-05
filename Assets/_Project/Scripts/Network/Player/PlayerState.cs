@@ -10,7 +10,7 @@ namespace LindoNoxStudio.Network.Player
         
         public ClientInputState InputUsedForNextTick;
 
-        public void SetUp(uint tick, Vector2 cycle, ClientInputState inputUsedForNextTick)
+        public void SetUp(uint tick, ClientInputState inputUsedForNextTick)
         {
             Tick = tick;
             InputUsedForNextTick = inputUsedForNextTick;
@@ -19,8 +19,6 @@ namespace LindoNoxStudio.Network.Player
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref Tick);
-            
-            serializer.SerializeValue(ref InputUsedForNextTick);
         }
     }
 }

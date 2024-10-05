@@ -1,3 +1,4 @@
+using System;
 using LindoNoxStudio.Network.Game;
 using Unity.Netcode;
 using UnityEngine;
@@ -7,12 +8,46 @@ namespace LindoNoxStudio.Network.Connection
     public static class ConnectionManager
     {
         #if Server
-        public const int WantedPlayerCount = 2;
+        public const int WantedPlayerCount = 1;
         public static int CurrentPlayerCount;
         
         public static void OnClientJoinRequest(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
-            var payload = ConnectionPayload.Decode(request.Payload);
+            #region Payload Decoder
+
+
+            if (request.Payload == null)
+            {
+                response.Approved = false;
+                response.Reason = "Payload is null";
+                return;
+            }
+
+            (ulong uuid, string displayName) payload;
+            try
+            {
+                payload = ConnectionPayload.Decode(request.Payload);
+            }
+            catch (Exception e)
+            {
+                response.Approved = false;
+                response.Reason = "Payload is not valid";
+                return;
+            }
+
+            if (string.IsNullOrEmpty(payload.displayName))
+            {
+                response.Approved = false;
+                response.Reason = "Payload is not valid";
+                return;
+            }
+            else if (payload.uuid == 0)
+            {
+                response.Approved = false;
+                response.Reason = "Payload is not valid";
+                return;
+            }
+            #endregion
 
             Client newClient = new Client()
             {

@@ -11,10 +11,10 @@ namespace LindoNoxStudio.Network.Player
             // Todo: Moving the player based on the input
         }
 
-        public PlayerState GetState(uint tick, Vector2 cycle, ClientInputState nextInput)
+        public PlayerState GetState(uint tick, ClientInputState nextInput)
         {
             PlayerState state = new PlayerState();
-            state.SetUp(tick, cycle, nextInput);
+            state.SetUp(tick, nextInput);
             
             return state;
         }

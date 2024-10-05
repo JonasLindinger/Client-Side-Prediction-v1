@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using LindoNoxStudio.Network.Simulation;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -47,9 +48,30 @@ namespace LindoNoxStudio.Network.Connection
         #if Client
         private void StartClient()
         {
+            NetworkManager.Singleton.OnConnectionEvent +=
+                (NetworkManager networkManager, ConnectionEventData connectionEvent) =>
+                {
+                    switch (connectionEvent.EventType)
+                    {
+                        case ConnectionEvent.ClientConnected:
+                            Debug.Log("Client connected.");
+                            break;
+                        case ConnectionEvent.ClientDisconnected:
+                            Debug.Log("Client disconnected. Reason: " + NetworkManager.Singleton.DisconnectReason);
+                            break;
+                    }
+                };
+            
             ulong clientId = (ulong) Random.Range(11111, 99999);
             NetworkManager.Singleton.NetworkConfig.ConnectionData = ConnectionPayload.Encode(clientId, "Client " + clientId);
-            NetworkManager.Singleton.StartClient();
+            if (!NetworkManager.Singleton.StartClient())
+            {
+                Debug.Log("Failed to start client.");
+            }
+            else
+            {
+                Debug.Log("Client started.");
+            }
         }
         #elif Server
         private void StartServer()
@@ -71,9 +93,16 @@ namespace LindoNoxStudio.Network.Connection
                             break;
                     }
                 };
-            
-            NetworkManager.Singleton.StartServer();
-            SimulationManager.StartTickSystem();
+
+            if (NetworkManager.Singleton.StartServer())
+            {
+                SimulationManager.StartTickSystem();
+                Debug.Log("Server started.");
+            }
+            else
+            {
+                Debug.Log("Failed to start server.");
+            }
         } 
         #endif
     }

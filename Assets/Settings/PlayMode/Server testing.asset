@@ -16,28 +16,30 @@ MonoBehaviour:
   m_EnableEditors: 1
   m_MainEditorInstance:
     Name: Main Editor
-    <CorrespondingNodeId>k__BackingField: 
-    m_Nodes: []
+    <CorrespondingNodeId>k__BackingField: Main Editor|0_run
+    m_Nodes:
+    - Main Editor|0_run
+    - Main Editor|0_deploy
     m_Role: 2
     m_PlayerTag: 
-    m_InitialScene: {fileID: 0}
+    m_InitialScene: {fileID: 102900000, guid: 3f4fc32e545fa3ee38d215d1235c4aca, type: 3}
   m_EditorInstances: []
   m_LocalInstances:
   - Name: Client Instance 1
-    <CorrespondingNodeId>k__BackingField: Server Instance - Run
+    <CorrespondingNodeId>k__BackingField: Client Instance 1 - Run
     m_Nodes:
-    - Server Instance - Build
-    - Server Instance - Run
+    - Client Instance 1 - Build
+    - Client Instance 1 - Run
     m_BuildProfile: {fileID: 11400000, guid: f17ec1461eac2506b9dc4cc3f7a234ec, type: 2}
     advancedConfiguration:
       m_StreamLogsToMainEditor: 1
       m_LogsColor: {r: 0.17895651, g: 1, b: 0, a: 1}
       m_Arguments: -screen-fullscreen 0 -screen-width 1024 -screen-height 720
   - Name: Client Instance 2
-    <CorrespondingNodeId>k__BackingField: Client Instance - Run
+    <CorrespondingNodeId>k__BackingField: Client Instance 2 - Run
     m_Nodes:
-    - Client Instance - Build
-    - Client Instance - Run
+    - Client Instance 2 - Build
+    - Client Instance 2 - Run
     m_BuildProfile: {fileID: 11400000, guid: f17ec1461eac2506b9dc4cc3f7a234ec, type: 2}
     advancedConfiguration:
       m_StreamLogsToMainEditor: 1

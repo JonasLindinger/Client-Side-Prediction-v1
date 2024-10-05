@@ -20,7 +20,7 @@ MonoBehaviour:
     m_Nodes: []
     m_Role: 2
     m_PlayerTag: 
-    m_InitialScene: {fileID: 0}
+    m_InitialScene: {fileID: 102900000, guid: 3f4fc32e545fa3ee38d215d1235c4aca, type: 3}
   m_EditorInstances: []
   m_LocalInstances:
   - Name: Client Instance

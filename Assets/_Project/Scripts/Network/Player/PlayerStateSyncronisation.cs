@@ -32,11 +32,11 @@ namespace LindoNoxStudio.Network.Player
         {
             #if Client
             // Saving last state to compare with the server's state
-            PlayerState state = _playerController.GetState(tick, input.Cycle, input);
+            PlayerState state = _playerController.GetState(tick, input);
             _predictedPlayerStates[tick % StateBufferSize] = state;
             #elif Server
             // Saving last state to send to the client later
-            PlayerState state = _playerController.GetState(tick, input.Cycle, input);
+            PlayerState state = _playerController.GetState(tick, input);
             _playerStates[tick % StateBufferSize] = state;
             _latestStateTick = tick;
             #endif
@@ -48,14 +48,19 @@ namespace LindoNoxStudio.Network.Player
         {
             PlayerState clientState = _predictedPlayerStates[serverState.Tick % StateBufferSize];
 
-            if (clientState.Tick != serverState.Tick)
+            if (clientState == null)
+            {
+                Debug.Log("Something went wrong.");
+                return;
+            }
+            else if (clientState.Tick != serverState.Tick)
             {
                 Debug.Log("Something went wrong.");
                 return;
             }
 
             // Todo: don't compair the input. Compare actual things like position, rotation, etc.
-            if (Vector2.Distance(clientState.InputUsedForNextTick.Cycle, clientState.InputUsedForNextTick.Cycle) >= 0.001f)
+            if (Vector2.Distance(clientState.InputUsedForNextTick.Cycle, serverState.InputUsedForNextTick.Cycle) >= 0.001f)
             {
                 Reconcile(serverState);
             }
@@ -94,20 +99,19 @@ namespace LindoNoxStudio.Network.Player
         public void SendState() 
         {
             PlayerState stateToSend = _playerStates[_latestStateTick % StateBufferSize];
-            
-            OnServerStateRPC(stateToSend);
+            OnServerStateRPC(stateToSend, stateToSend.InputUsedForNextTick);
         } 
         
         #endif
         
         [Rpc(SendTo.Owner, Delivery = RpcDelivery.Reliable)]
-        private void OnServerStateRPC(PlayerState playerState)
+        private void OnServerStateRPC(PlayerState playerState, ClientInputState inputForNextTick)
         {
-            Debug.Log("On Server State received.");
             #if Client
             // Warning: Don't run this RPC unreliable, without changing this code down here!!!!!!!!!!!!!!!!!!!!!!!
             _latestStateTick = playerState.Tick;
-            
+
+            playerState.InputUsedForNextTick = inputForNextTick;
             HandleReconciliation(playerState);
             #endif
         }
