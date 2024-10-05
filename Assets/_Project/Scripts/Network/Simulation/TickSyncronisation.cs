@@ -5,6 +5,8 @@ namespace LindoNoxStudio.Network.Simulation
 {
     public class TickSyncronisation : NetworkBehaviour
     {
+        [SerializeField] private WantedBufferSize _wantedBufferSize = WantedBufferSize.Balanced;
+        
         #if Client
         public const int StartingTickOffset = 5;
         #endif
@@ -36,12 +38,8 @@ namespace LindoNoxStudio.Network.Simulation
         {
             #if Client
             
-            // Todo: Let the user choose his bufferSize
-            // Low Latency: 3
-            // Balanced: 6
-            // High Latency: 12
-            
-            int wantedBufferSize = 6;
+            int wantedBufferSize = (int) _wantedBufferSize;
+            Debug.Log((int) _wantedBufferSize);
 
             short tickAdjustment = short.Parse((wantedBufferSize - bufferSize).ToString());
 

@@ -55,7 +55,7 @@ namespace LindoNoxStudio.Network.Player
             }
             else if (clientState.Tick != serverState.Tick)
             {
-                Debug.Log("Something went wrong. " + clientState.Tick + " != " + serverState.Tick);
+                Debug.Log("Something went wrong. " + clientState.Tick + " != " + serverState.Tick + " % " + (serverState.Tick - clientState.Tick) % StateBufferSize);
                 return;
             }
 

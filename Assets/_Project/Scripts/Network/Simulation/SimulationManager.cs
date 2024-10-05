@@ -116,7 +116,6 @@ namespace LindoNoxStudio.Network.Simulation
         #if Server
         private static void HandleAdjustmentTick(uint tick)
         {
-            // Todo: Only do this, when the buffer size was overwritten at least once.
             // Sending bufferSize to clients
             foreach (var client in Client.Clients)
             {
@@ -124,8 +123,6 @@ namespace LindoNoxStudio.Network.Simulation
                 if (!client.NetworkClient._tickSyncronisation) continue;
                 client.NetworkClient._tickSyncronisation.SendBufferSize(client.NetworkClient._input._bufferSize);
             }
-            // Todo: Send tick adjustments to clients
-            // Todo: Add options: BufferSize: Minimal, Good, Maximal
         }
         #endif
     }
