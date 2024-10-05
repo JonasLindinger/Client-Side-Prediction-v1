@@ -73,6 +73,19 @@ namespace LindoNoxStudio.Network.Simulation
         }
 
         #if Client
+        public static void AdjustTick(int ammount)
+        {
+            if (ammount < 0)
+            {
+                ammount = Mathf.Abs(ammount);
+                PhysicsTickSystem.SkipTick(ammount);
+            }
+            else
+            {
+                PhysicsTickSystem.CalculateExtraTicks(ammount);
+            }
+        }
+        
         private static void SaveInput(uint tick)
         {
             // Saving input for the current tick
@@ -103,6 +116,14 @@ namespace LindoNoxStudio.Network.Simulation
         #if Server
         private static void HandleAdjustmentTick(uint tick)
         {
+            // Todo: Only do this, when the buffer size was overwritten at least once.
+            // Sending bufferSize to clients
+            foreach (var client in Client.Clients)
+            {
+                if (!client.NetworkClient) continue;
+                if (!client.NetworkClient._tickSyncronisation) continue;
+                client.NetworkClient._tickSyncronisation.SendBufferSize(client.NetworkClient._input._bufferSize);
+            }
             // Todo: Send tick adjustments to clients
             // Todo: Add options: BufferSize: Minimal, Good, Maximal
         }

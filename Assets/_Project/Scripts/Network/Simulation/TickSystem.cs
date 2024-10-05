@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace LindoNoxStudio.Network.Simulation
 {
@@ -11,6 +12,9 @@ namespace LindoNoxStudio.Network.Simulation
         public float TimeBetweenTicks { get; private set; }
         
         private float _time;
+        
+        // Tick Adjustment
+        private int _ticksToSkip;
         
         public TickSystem(int tickRate, uint startingTick = 0)
         {
@@ -27,6 +31,31 @@ namespace LindoNoxStudio.Network.Simulation
             if (_time >= TimeBetweenTicks)
             {
                 _time -= TimeBetweenTicks;
+
+                if (_ticksToSkip > 0)
+                {
+                    _ticksToSkip--;
+                    Debug.Log("Skipping tick");
+                    return;
+                }
+                
+                CurrentTick++;
+                OnTick?.Invoke(CurrentTick);
+            }
+        }
+
+        public void SkipTick(int ammount)
+        {
+            _ticksToSkip = ammount;
+        }
+
+        public void CalculateExtraTicks(int ammount)
+        {
+            _ticksToSkip = 0;
+
+            for (int i = 0; i < ammount; i++)
+            {
+                Debug.Log("Extra tick");
                 
                 CurrentTick++;
                 OnTick?.Invoke(CurrentTick);

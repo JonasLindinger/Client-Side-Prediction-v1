@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using LindoNoxStudio.Network.Input;
+using LindoNoxStudio.Network.Simulation;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace LindoNoxStudio.Network.Connection
 {
@@ -18,6 +20,7 @@ namespace LindoNoxStudio.Network.Connection
         private Client _networkClient;
         #endif
         
+        [HideInInspector] public TickSyncronisation _tickSyncronisation;
         [HideInInspector] public ClientInput _input;
         
         public override void OnNetworkSpawn()
@@ -37,6 +40,7 @@ namespace LindoNoxStudio.Network.Connection
             
             #endif
             
+            _tickSyncronisation = GetComponent<TickSyncronisation>();
             _input = GetComponent<ClientInput>();
         }
 

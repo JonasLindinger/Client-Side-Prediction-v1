@@ -21,10 +21,11 @@ namespace LindoNoxStudio.Network.Input
         
         #elif Server
         private ClientInputState[] _clientInputStates = new ClientInputState[InputBufferSize];
-
-        private int _bufferSize;
+        
         #endif
 
+        [HideInInspector] public int _bufferSize = 3;
+        
         public override void OnNetworkSpawn()
         {
             #if Client
@@ -143,7 +144,7 @@ namespace LindoNoxStudio.Network.Input
                     newestInputTick = input.Tick;
             }
 
-            _bufferSize = Mathf.RoundToInt(newestInputTick - SimulationManager.CurrentTick);
+            _bufferSize = short.Parse((newestInputTick - SimulationManager.CurrentTick).ToString());
             #endif
         }
     }
