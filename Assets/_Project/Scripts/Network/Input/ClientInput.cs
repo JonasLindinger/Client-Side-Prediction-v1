@@ -65,9 +65,13 @@ namespace LindoNoxStudio.Network.Input
             ClientInputState clientInputState = new ClientInputState();
             if (isCurrentTick)
             {
-                Vector2 cycle = _playerInput.actions["Move"].ReadValue<Vector2>();
+                Vector2 moveInput = _playerInput.actions["Move"].ReadValue<Vector2>();
+                bool isSprinting = _playerInput.actions["Sprint"].ReadValue<float>() >= 0.4f;
+                bool isJumping = _playerInput.actions["Jump"].ReadValue<float>() >= 0.4f;
+                bool isCrouching = _playerInput.actions["Crouch"].ReadValue<float>() >= 0.4f;
+                float playerRotation = 0;
             
-                clientInputState.SetUp(tick, cycle);
+                clientInputState.SetUp(tick, moveInput, isSprinting, isJumping, isCrouching, playerRotation);
             }
             else
             {
@@ -121,7 +125,7 @@ namespace LindoNoxStudio.Network.Input
             else if (clientInputState == null)
             {
                 clientInputState = new ClientInputState();
-                clientInputState.SetUp(tick, Vector2.zero);
+                clientInputState.SetUp(tick, Vector2.zero, false, false, false, 0);
                 _clientInputStates[tick % InputBufferSize] = clientInputState;
             }
 

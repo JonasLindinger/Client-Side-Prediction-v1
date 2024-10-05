@@ -55,12 +55,15 @@ namespace LindoNoxStudio.Network.Player
             }
             else if (clientState.Tick != serverState.Tick)
             {
-                Debug.Log("Something went wrong.");
+                Debug.Log("Something went wrong. " + clientState.Tick + " != " + serverState.Tick);
                 return;
             }
 
-            // Todo: don't compair the input. Compare actual things like position, rotation, etc.
-            if (Vector2.Distance(clientState.InputUsedForNextTick.Cycle, serverState.InputUsedForNextTick.Cycle) >= 0.001f)
+            if (Vector3.Distance(clientState.Position, serverState.Position) >= 0.001f)
+            {
+                Reconcile(serverState);
+            }
+            else if (Vector3.Distance(clientState.Rotation, serverState.Rotation) >= 0.001f)
             {
                 Reconcile(serverState);
             }
@@ -72,7 +75,7 @@ namespace LindoNoxStudio.Network.Player
 
         private void Reconcile(PlayerState correctState)
         {
-            Debug.Log("Prediction was not correct.");
+            Debug.Log("Prediction was not correct. ");
             // Save the state
             _predictedPlayerStates[correctState.Tick % StateBufferSize] = correctState;
             
@@ -90,7 +93,9 @@ namespace LindoNoxStudio.Network.Player
 
         private void ApplyState(PlayerState stateToApply)
         {
-            // Todo: Apply state of this player
+            // Applying the state on this client
+            _playerController.ApplyState(stateToApply);
+
             // Todo: Apply state of other players
         }
         

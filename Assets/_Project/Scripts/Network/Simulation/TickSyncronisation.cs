@@ -36,8 +36,6 @@ namespace LindoNoxStudio.Network.Simulation
         {
             #if Client
             
-            Debug.Log("Buffer size: " + bufferSize.ToString());
-            
             // Todo: Let the user choose his bufferSize
             // Low Latency: 3
             // Balanced: 6
