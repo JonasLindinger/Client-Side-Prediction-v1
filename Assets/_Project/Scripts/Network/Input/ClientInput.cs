@@ -147,8 +147,9 @@ namespace LindoNoxStudio.Network.Input
                 if (newestInputTick < input.Tick)
                     newestInputTick = input.Tick;
             }
-
-            _bufferSize = short.Parse((newestInputTick - SimulationManager.CurrentTick).ToString());
+            
+            _bufferSize = (int) (newestInputTick - SimulationManager.CurrentTick);
+            
             #endif
         }
     }

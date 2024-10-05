@@ -8,7 +8,7 @@ namespace LindoNoxStudio.Network.Connection
     public static class ConnectionManager
     {
         #if Server
-        public const int WantedPlayerCount = 1;
+        public const int WantedPlayerCount = 2;
         public static int CurrentPlayerCount;
         
         public static void OnClientJoinRequest(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)

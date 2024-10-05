@@ -44,10 +44,11 @@ namespace LindoNoxStudio.Network.Player
 
         #if Client
         
+        bool wasWrong = false;
         private void HandleReconciliation(PlayerState serverState)
         {
             PlayerState clientState = _predictedPlayerStates[serverState.Tick % StateBufferSize];
-
+            
             if (clientState == null)
             {
                 Debug.Log("Something went wrong.");
@@ -56,7 +57,14 @@ namespace LindoNoxStudio.Network.Player
             else if (clientState.Tick != serverState.Tick)
             {
                 Debug.Log("Something went wrong. " + clientState.Tick + " != " + serverState.Tick + " % " + (serverState.Tick - clientState.Tick) % StateBufferSize);
+                wasWrong = true;
                 return;
+            }
+            else
+            {
+                if (wasWrong)
+                    Debug.Log("Nothing went wrong.");
+                wasWrong = false;
             }
 
             if (Vector3.Distance(clientState.Position, serverState.Position) >= 0.001f)
