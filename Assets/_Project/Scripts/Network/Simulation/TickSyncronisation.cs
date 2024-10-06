@@ -39,26 +39,24 @@ namespace LindoNoxStudio.Network.Simulation
             #if Client
             
             int wantedBufferSize = (int) _wantedBufferSize;
-            Debug.Log((int) _wantedBufferSize);
 
             short tickAdjustment = short.Parse((wantedBufferSize - bufferSize).ToString());
 
-            // Save check
+            // If there is nothing to adjust, return.
+            if (tickAdjustment == 0) 
+                return;
+            
+            // Limiting the tick adjustment to +/-10 ticks.
             if (tickAdjustment > 10)
-            {
                 tickAdjustment = 10;
-                Debug.LogError("The internet is too bad for this game");
-            }
             else if (tickAdjustment < -10)
-            {
                 tickAdjustment = -10;
-                Debug.LogError("The internet is too bad for this game");
-            }
 
             // Skipping 1, 2 or 3 ticks isn't worth it.
             if (tickAdjustment < 0 && tickAdjustment >= 3)
                 return;
             
+            Debug.LogWarning("Adjusting tick");
             SimulationManager.AdjustTick(tickAdjustment);
 
             #endif

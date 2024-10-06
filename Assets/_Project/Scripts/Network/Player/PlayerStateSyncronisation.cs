@@ -41,15 +41,9 @@ namespace LindoNoxStudio.Network.Player
             PlayerState clientState = _playerNetworkedObject.GetSnapshot(serverState.Tick);
             
             if (clientState == null)
-            {
-                Debug.Log("Something went wrong.");
                 return;
-            }
             else if (clientState.Tick != serverState.Tick)
-            {
-                Debug.Log("Something went wrong. ");
                 return;
-            }
             
             if (Vector3.Distance(clientState.Position, serverState.Position) >= 0.001f)
             {
@@ -61,14 +55,13 @@ namespace LindoNoxStudio.Network.Player
             }
             else 
             {
-                Debug.Log("Prediction was correct.");
                 _playerNetworkedObject.TakeSnapshot(serverState.Tick);
             }
         }
 
         private void Reconcile(PlayerState correctState, ClientInputState inputUsedForNextTick)
         {
-            Debug.Log("Prediction was not correct. ");
+            Debug.LogWarning("Prediction was not correct. ");
             // Save the state
             NetworkedObject.Rollback(correctState.Tick);
             
@@ -83,14 +76,6 @@ namespace LindoNoxStudio.Network.Player
             {
                 SimulationManager.HandlePhysicsTick(tick, true);
             }
-        }
-
-        private void ApplyState(PlayerState stateToApply)
-        {
-            // Applying the state on this client
-            _playerController.ApplyState(stateToApply);
-
-            // Todo: Apply state of other players
         }
         
         #elif Server

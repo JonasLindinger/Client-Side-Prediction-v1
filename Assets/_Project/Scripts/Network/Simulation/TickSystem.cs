@@ -35,7 +35,6 @@ namespace LindoNoxStudio.Network.Simulation
                 if (_ticksToSkip > 0)
                 {
                     _ticksToSkip--;
-                    Debug.Log("Skipping tick");
                     return;
                 }
                 
@@ -55,8 +54,6 @@ namespace LindoNoxStudio.Network.Simulation
 
             for (int i = 0; i < ammount; i++)
             {
-                Debug.Log("Extra tick");
-                
                 CurrentTick++;
                 OnTick?.Invoke(CurrentTick);
             }

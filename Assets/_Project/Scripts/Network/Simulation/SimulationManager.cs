@@ -55,7 +55,6 @@ namespace LindoNoxStudio.Network.Simulation
 
         public static void HandlePhysicsTick(uint tick)
         {
-            Debug.Log("Simulating physics for the time between ticks");
             // Simulating physics for the time between ticks
             Physics.Simulate(PhysicsTickSystem.TimeBetweenTicks);
 
