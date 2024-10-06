@@ -70,3 +70,18 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Ignore Mono crash files
+mono_crash*
+
+# Ignore Qodana files
+qodana*
+
+# Ignore IntelliJ IDEA configuration files
+.idea/
+
+# Ignore Plastic SCM files
+.plastic/
+
+# Ignore ignore.conf file
+ignore.conf
