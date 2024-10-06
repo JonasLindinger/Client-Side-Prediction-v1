@@ -1,4 +1,0 @@
-repository "Client Side Prediction v1@Stellar_Dash@cloud"
-  path "/"
-    br "/main"
-    co "/main"
