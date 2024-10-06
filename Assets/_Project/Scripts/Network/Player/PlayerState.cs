@@ -7,7 +7,6 @@ namespace LindoNoxStudio.Network.Player
     public class PlayerState : INetworkSerializable
     {
         public uint Tick;
-        public ClientInputState InputUsedForNextTick;
         public Vector3 Position;
         public Vector3 Rotation;
         public Vector3 Velocity;

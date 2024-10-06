@@ -13,7 +13,7 @@ namespace LindoNoxStudio.Network.Connection
         public static ConnectionData ConnectionData = new ConnectionData()
         {
             IP = "127.0.0.1",
-            Port = 7777
+            Port = 7778
         };
         
         private UnityTransport _unityTransport; 

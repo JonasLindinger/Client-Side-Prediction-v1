@@ -105,7 +105,7 @@ namespace LindoNoxStudio.Network.Player
 
         #region State
 
-        public PlayerState GetState(uint tick, ClientInputState nextInput)
+        public PlayerState GetState(uint tick)
         {
             PlayerState state = new PlayerState();
             state.SetUp(tick, transform.position, transform.eulerAngles, rb.linearVelocity);

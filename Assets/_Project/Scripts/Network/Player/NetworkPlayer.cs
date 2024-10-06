@@ -1,4 +1,5 @@
 using LindoNoxStudio.Network.Input;
+using LindoNoxStudio.Network.Simulation;
 using Unity.Netcode;
 using UnityEngine;
 using Client = LindoNoxStudio.Network.Connection.Client;
@@ -19,6 +20,7 @@ namespace LindoNoxStudio.Network.Player
         #endif
         
         private PlayerController _playerController;
+        private PlayerNetworkedObject _playerNetworkedObject;
         [HideInInspector] public PlayerStateSyncronisation _playerStateSyncronisation;
         
         public override void OnNetworkSpawn()
@@ -34,6 +36,7 @@ namespace LindoNoxStudio.Network.Player
 
             _playerStateSyncronisation = GetComponent<PlayerStateSyncronisation>();
             _playerController = GetComponent<PlayerController>();
+            _playerNetworkedObject = GetComponent<PlayerNetworkedObject>();
         }
         
         public override void OnNetworkDespawn()
@@ -50,7 +53,7 @@ namespace LindoNoxStudio.Network.Player
             // Getting input to process
             ClientInputState input = NetworkClient.LocalClient._input.GetClientInputState(tick);
             
-            _playerStateSyncronisation.SaveState(tick, input);
+            _playerNetworkedObject.TakeSnapshot(tick);
 
             // Process new input
             _playerController.OnInput(input);

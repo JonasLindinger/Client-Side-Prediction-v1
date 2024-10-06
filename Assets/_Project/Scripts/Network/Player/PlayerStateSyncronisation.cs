@@ -5,16 +5,16 @@ using UnityEngine;
 
 namespace LindoNoxStudio.Network.Player
 {
+    [RequireComponent(typeof(PlayerNetworkedObject))]
     public class PlayerStateSyncronisation : NetworkBehaviour
     {
-        private const int StateBufferSize = 128; // 8 bit | 1 byte
-        
         #if Client
-        
-        private PlayerState[] _predictedPlayerStates = new PlayerState[StateBufferSize];
-        
+        private PlayerNetworkedObject _playerNetworkedObject;
         #elif Server
         
+        private const int StateBufferSize = 128; // 8 bit | 1 byte
+        
+        private ClientInputState[] _inputStates = new ClientInputState[StateBufferSize];
         private PlayerState[] _playerStates = new PlayerState[StateBufferSize];
         
         #endif
@@ -26,28 +26,19 @@ namespace LindoNoxStudio.Network.Player
         public override void OnNetworkSpawn()
         {
             _playerController = GetComponent<PlayerController>();
-        }
-
-        public void SaveState(uint tick, ClientInputState input)
-        {
             #if Client
-            // Saving last state to compare with the server's state
-            PlayerState state = _playerController.GetState(tick, input);
-            _predictedPlayerStates[tick % StateBufferSize] = state;
-            #elif Server
-            // Saving last state to send to the client later
-            PlayerState state = _playerController.GetState(tick, input);
-            _playerStates[tick % StateBufferSize] = state;
-            _latestStateTick = tick;
+            
+            _playerNetworkedObject = GetComponent<PlayerNetworkedObject>();
+            
             #endif
         }
 
+
         #if Client
         
-        bool wasWrong = false;
-        private void HandleReconciliation(PlayerState serverState)
+        private void HandleReconciliation(PlayerState serverState, ClientInputState inputUsedForNextTick)
         {
-            PlayerState clientState = _predictedPlayerStates[serverState.Tick % StateBufferSize];
+            PlayerState clientState = _playerNetworkedObject.GetSnapshot(serverState.Tick);
             
             if (clientState == null)
             {
@@ -56,46 +47,41 @@ namespace LindoNoxStudio.Network.Player
             }
             else if (clientState.Tick != serverState.Tick)
             {
-                Debug.Log("Something went wrong. " + clientState.Tick + " != " + serverState.Tick + " % " + (serverState.Tick - clientState.Tick) % StateBufferSize);
-                wasWrong = true;
+                Debug.Log("Something went wrong. ");
                 return;
             }
-            else
-            {
-                if (wasWrong)
-                    Debug.Log("Nothing went wrong.");
-                wasWrong = false;
-            }
-
+            
             if (Vector3.Distance(clientState.Position, serverState.Position) >= 0.001f)
             {
-                Reconcile(serverState);
+                Reconcile(serverState, inputUsedForNextTick);
             }
             else if (Vector3.Distance(clientState.Rotation, serverState.Rotation) >= 0.001f)
             {
-                Reconcile(serverState);
+                Reconcile(serverState, inputUsedForNextTick);
             }
             else 
             {
                 Debug.Log("Prediction was correct.");
+                _playerNetworkedObject.TakeSnapshot(serverState.Tick);
             }
         }
 
-        private void Reconcile(PlayerState correctState)
+        private void Reconcile(PlayerState correctState, ClientInputState inputUsedForNextTick)
         {
             Debug.Log("Prediction was not correct. ");
             // Save the state
-            _predictedPlayerStates[correctState.Tick % StateBufferSize] = correctState;
+            NetworkedObject.Rollback(correctState.Tick);
             
             // Applying correct state
-            ApplyState(_predictedPlayerStates[correctState.Tick % StateBufferSize]);
+            _playerNetworkedObject.ApplySnapshot(correctState);
+            _playerNetworkedObject.TakeSnapshot(correctState.Tick);
             
             // Use the input to predict the next states
-            _playerController.OnInput(correctState.InputUsedForNextTick);
+            _playerController.OnInput(inputUsedForNextTick);
             
             for (uint tick = correctState.Tick + 1; tick < SimulationManager.CurrentTick + 1; tick++)
             {
-                SimulationManager.HandlePhysicsTick(tick);
+                SimulationManager.HandlePhysicsTick(tick, true);
             }
         }
 
@@ -108,24 +94,40 @@ namespace LindoNoxStudio.Network.Player
         }
         
         #elif Server
+            
+        public void SaveState(uint tick, ClientInputState input)
+        {
+            // Saving last state to send to the client later
+            PlayerState state = _playerController.GetState(tick);
+            _playerStates[tick % StateBufferSize] = state;
+            _latestStateTick = tick;
+        }
         
         public void SendState() 
         {
             PlayerState stateToSend = _playerStates[_latestStateTick % StateBufferSize];
-            OnServerStateRPC(stateToSend, stateToSend.InputUsedForNextTick);
+            ClientInputState inputToSend = _inputStates[_latestStateTick % StateBufferSize];
+            OnServerStateRPC(stateToSend, inputToSend);
         } 
         
         #endif
         
-        [Rpc(SendTo.Owner, Delivery = RpcDelivery.Reliable)]
-        private void OnServerStateRPC(PlayerState playerState, ClientInputState inputForNextTick)
+        [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Reliable)]
+        private void OnServerStateRPC(PlayerState playerState, ClientInputState inputUsedForNextTick)
         {
             #if Client
             // Warning: Don't run this RPC unreliable, without changing this code down here!!!!!!!!!!!!!!!!!!!!!!!
-            _latestStateTick = playerState.Tick;
-
-            playerState.InputUsedForNextTick = inputForNextTick;
-            HandleReconciliation(playerState);
+            if (!IsOwner)
+            {
+                _playerNetworkedObject.ApplySnapshot(playerState);
+                _playerNetworkedObject.TakeSnapshot(playerState.Tick);
+            }
+            else
+            {
+                _latestStateTick = playerState.Tick;
+            
+                HandleReconciliation(playerState, inputUsedForNextTick);
+            }
             #endif
         }
     }

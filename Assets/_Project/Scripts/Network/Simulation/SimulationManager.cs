@@ -55,10 +55,35 @@ namespace LindoNoxStudio.Network.Simulation
 
         public static void HandlePhysicsTick(uint tick)
         {
+            Debug.Log("Simulating physics for the time between ticks");
             // Simulating physics for the time between ticks
             Physics.Simulate(PhysicsTickSystem.TimeBetweenTicks);
 
             #if Client
+            
+            // Predicting local player state and sending input to server
+            if (NetworkPlayer.LocalNetworkPlayer)
+                NetworkPlayer.LocalNetworkPlayer.PredictLocalState(tick);
+            #elif Server
+            // Move all players
+            foreach (Client client in Client.Clients)
+            {
+                if (!client.NetworkPlayer) continue;
+                client.NetworkPlayer.HandleState(tick);
+            }
+            #endif
+        }
+        
+        public static void HandlePhysicsTick(uint tick, bool isReaconciliation = false)
+        {
+            // Simulating physics for the time between ticks
+            Physics.Simulate(PhysicsTickSystem.TimeBetweenTicks);
+
+            #if Client
+            // Rollback all other objects if isReaconciliation is true
+            if (isReaconciliation)
+                NetworkedObject.Rollback(tick);
+            
             // Predicting local player state and sending input to server
             if (NetworkPlayer.LocalNetworkPlayer)
                 NetworkPlayer.LocalNetworkPlayer.PredictLocalState(tick);
