@@ -1,2 +1,2 @@
 # Client-Side-Prediction-v1
- Client-Side-Prediction in development
+ Client-Side-Prediction for an FPS Game
